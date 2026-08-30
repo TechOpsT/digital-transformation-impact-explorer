@@ -4,7 +4,7 @@ A cloud-native learning and assessment application that explains how digital tra
 
 ## Status
 
-**Phase 1 — walking skeleton in development.** The repository contains the React interface, three FastAPI services, versioned definitions, PostgreSQL migrations, deterministic seeding, Redis caching, and the first end-to-end assessment workflow.
+**Phase 1 — walking skeleton complete.** The React interface, three FastAPI services, versioned definitions, PostgreSQL migrations, deterministic seeding, Redis caching, runtime contracts, and end-to-end assessment workflow have passed the Phase 1 validation gate.
 
 ## Product scope
 

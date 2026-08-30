@@ -12,7 +12,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d transformation"]
+      test: ["CMD-SHELL", "test -f /var/lib/postgresql/data/.platform-lab-initialized && pg_isready -U postgres -d transformation"]
       interval: 3s
       timeout: 3s
       retries: 20
@@ -31,6 +31,7 @@ services:
     build:
       context: .
       dockerfile: services/content-service/Dockerfile
+      target: runtime
     command: ["alembic", "upgrade", "head"]
     environment:
       CONTENT_MIGRATION_DATABASE_URL: postgresql+psycopg://content_migrator:${MIGRATION_DATABASE_PASSWORD}@postgres:5432/transformation
@@ -41,6 +42,7 @@ services:
     build:
       context: .
       dockerfile: services/content-service/Dockerfile
+      target: runtime
     command: ["python", "-m", "app.seed"]
     environment:
       CONTENT_DATABASE_URL: postgresql+psycopg://content:${CONTENT_DATABASE_PASSWORD}@postgres:5432/transformation
@@ -52,6 +54,7 @@ services:
     build:
       context: .
       dockerfile: services/assessment-service/Dockerfile
+      target: runtime
     command: ["alembic", "upgrade", "head"]
     environment:
       ASSESSMENT_MIGRATION_DATABASE_URL: postgresql+psycopg://assessment_migrator:${MIGRATION_DATABASE_PASSWORD}@postgres:5432/transformation
@@ -62,6 +65,7 @@ services:
     build:
       context: .
       dockerfile: services/content-service/Dockerfile
+      target: runtime
     environment:
       CONTENT_DATABASE_URL: postgresql+psycopg://content:${CONTENT_DATABASE_PASSWORD}@postgres:5432/transformation
       CONTENT_DEFINITIONS_DIR: /app/definitions
@@ -78,6 +82,7 @@ services:
     build:
       context: .
       dockerfile: services/recommendation-service/Dockerfile
+      target: runtime
     ports: ["8003:8003"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health/ready')"]
@@ -89,6 +94,7 @@ services:
     build:
       context: .
       dockerfile: services/assessment-service/Dockerfile
+      target: runtime
     environment:
       ASSESSMENT_DATABASE_URL: postgresql+psycopg://assessment:${ASSESSMENT_DATABASE_PASSWORD}@postgres:5432/transformation
       ASSESSMENT_REDIS_URL: redis://redis:6379/0

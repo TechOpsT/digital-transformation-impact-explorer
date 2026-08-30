@@ -17,3 +17,8 @@ GRANT USAGE ON SCHEMA assessment TO assessment;
 ALTER DEFAULT PRIVILEGES FOR ROLE content_migrator IN SCHEMA content GRANT SELECT, INSERT ON TABLES TO content;
 ALTER DEFAULT PRIVILEGES FOR ROLE assessment_migrator IN SCHEMA assessment GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO assessment;
 SQL
+
+# The entrypoint briefly starts PostgreSQL while running init scripts. This
+# marker prevents dependent migration jobs from mistaking that temporary
+# server for the fully initialized database.
+touch /var/lib/postgresql/data/.platform-lab-initialized

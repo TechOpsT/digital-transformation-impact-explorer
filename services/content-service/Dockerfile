@@ -15,6 +15,6 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--no-acc
 
 FROM runtime AS test
 USER root
-RUN pip install pytest==9.1.1
+RUN pip install pytest==9.1.1 httpx2==2.12.0
 USER 10001:10001
-CMD ["pytest", "-q"]
+CMD ["pytest", "-q", "-p", "no:cacheprovider"]

@@ -48,6 +48,7 @@ const required = [
   "docs/decisions/0006-definition-source-and-seeding.md",
   "docs/evidence/phase-0-completion.md",
   "docs/evidence/phase-1-validation.md",
+  "docs/evidence/phase-1-completion.md",
   "contracts/openapi/README.md",
   "contracts/examples/assessment-result.json",
   "contracts/examples/problem.json",

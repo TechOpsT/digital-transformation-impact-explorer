@@ -5,7 +5,10 @@ const assessment = "http://localhost:8002";
 
 async function json(url, init) {
   const response = await fetch(url, { ...init, headers: { "Content-Type": "application/json", "X-Request-ID": "phase-1-walking-skeleton" } });
-  assert.ok(response.ok, `${init?.method ?? "GET"} ${url} returned ${response.status}: ${await response.text()}`);
+  if (!response.ok) {
+    const body = await response.text();
+    assert.fail(`${init?.method ?? "GET"} ${url} returned ${response.status}: ${body}`);
+  }
   assert.equal(response.headers.get("x-request-id"), "phase-1-walking-skeleton");
   return response.json();
 }
