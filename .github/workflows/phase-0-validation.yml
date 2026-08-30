@@ -21,8 +21,9 @@ jobs:
           node-version: 20
       - name: Check repository conventions
         run: node scripts/check-repository.mjs
+      - name: Install pinned validation dependencies
+        run: npm ci
       - name: Validate OpenAPI contracts
-        run: node tests/contract/validate-contracts.mjs
+        run: npm run contract-test
       - name: Test scoring specification examples
         run: node --test tests/unit/*.test.mjs
-

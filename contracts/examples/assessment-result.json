@@ -1,0 +1,44 @@
+{
+  "assessmentId": "48e3abf2-614c-44b5-aa00-2a27c6351517",
+  "questionnaireVersion": "questionnaire-1.0.0",
+  "scoringVersion": "scoring-1.0.0",
+  "recommendationRuleSetVersion": "recommendations-1.0.0",
+  "overallScore": 50.0,
+  "maturityLevel": "Developing",
+  "dimensionScores": [
+    {"dimensionId": "software-delivery", "raw": 8, "possible": 16, "normalized": 50.0, "weight": 0.1666666667},
+    {"dimensionId": "reliability-and-operations", "raw": 6, "possible": 16, "normalized": 37.5, "weight": 0.1666666667},
+    {"dimensionId": "security-and-governance", "raw": 4, "possible": 16, "normalized": 25.0, "weight": 0.1666666667},
+    {"dimensionId": "data-and-decision-making", "raw": 10, "possible": 16, "normalized": 62.5, "weight": 0.1666666667},
+    {"dimensionId": "developer-experience", "raw": 8, "possible": 16, "normalized": 50.0, "weight": 0.1666666667},
+    {"dimensionId": "organizational-culture", "raw": 12, "possible": 16, "normalized": 75.0, "weight": 0.1666666667}
+  ],
+  "recommendations": [
+    {
+      "ruleId": "security-foundations-low",
+      "dimensionId": "security-and-governance",
+      "triggerScore": 25.0,
+      "priority": 1,
+      "rationale": "Security and governance is the lowest-scoring dimension.",
+      "action": "Introduce automated dependency and container-image scanning with an explicit severity policy."
+    },
+    {
+      "ruleId": "reliability-feedback-low",
+      "dimensionId": "reliability-and-operations",
+      "triggerScore": 37.5,
+      "priority": 2,
+      "rationale": "Operational feedback practices are still developing.",
+      "action": "Define service-level indicators and test one dependency-failure scenario."
+    },
+    {
+      "ruleId": "delivery-flow-developing",
+      "dimensionId": "software-delivery",
+      "triggerScore": 50.0,
+      "priority": 3,
+      "rationale": "Delivery practices are defined but not yet consistently optimized.",
+      "action": "Measure lead time and deployment failure rate for the primary delivery path."
+    }
+  ],
+  "completedAt": "2026-08-30T18:00:00Z"
+}
+

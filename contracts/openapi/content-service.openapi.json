@@ -1,31 +1,442 @@
 {
   "openapi": "3.1.0",
-  "info": {"title": "Content Service API", "version": "1.0.0"},
-  "servers": [{"url": "/"}],
+  "info": {
+    "title": "Content Service API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [],
   "paths": {
-    "/api/v1/dimensions": {"get": {"operationId": "listDimensions", "responses": {"200": {"description": "Dimensions", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Dimension"}}}}}, "default": {"$ref": "#/components/responses/Error"}}}},
-    "/api/v1/dimensions/{dimensionId}": {"get": {"operationId": "getDimension", "parameters": [{"$ref": "#/components/parameters/DimensionId"}], "responses": {"200": {"description": "Dimension", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Dimension"}}}}, "404": {"$ref": "#/components/responses/Error"}}}},
-    "/api/v1/topics": {"get": {"operationId": "listTopics", "parameters": [{"name": "dimensionId", "in": "query", "schema": {"type": "string", "pattern": "^[a-z0-9-]+$"}}], "responses": {"200": {"description": "Topics", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Topic"}}}}}, "default": {"$ref": "#/components/responses/Error"}}}},
-    "/api/v1/topics/{topicId}": {"get": {"operationId": "getTopic", "parameters": [{"name": "topicId", "in": "path", "required": true, "schema": {"type": "string", "pattern": "^[a-z0-9-]+$"}}], "responses": {"200": {"description": "Topic", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Topic"}}}}, "404": {"$ref": "#/components/responses/Error"}}}},
-    "/api/v1/questionnaires/current": {"get": {"operationId": "getCurrentQuestionnaire", "responses": {"200": {"description": "Published questionnaire", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Questionnaire"}}}}, "503": {"$ref": "#/components/responses/Error"}}}},
-    "/health/live": {"get": {"operationId": "getLiveness", "responses": {"200": {"$ref": "#/components/responses/Health"}}}},
-    "/health/ready": {"get": {"operationId": "getReadiness", "responses": {"200": {"$ref": "#/components/responses/Health"}, "503": {"$ref": "#/components/responses/Health"}}}},
-    "/metrics": {"get": {"operationId": "getMetrics", "responses": {"200": {"description": "Prometheus text exposition", "content": {"text/plain": {"schema": {"type": "string"}}}}}}}
+    "/api/v1/dimensions": {
+      "get": {
+        "summary": "List transformation dimensions",
+        "operationId": "listDimensions",
+        "responses": {
+          "200": {
+            "description": "Dimensions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Dimension"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/dimensions/{dimensionId}": {
+      "get": {
+        "summary": "Get a transformation dimension",
+        "operationId": "getDimension",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DimensionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dimension",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dimension"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/topics": {
+      "get": {
+        "summary": "List transformation topics",
+        "operationId": "listTopics",
+        "parameters": [
+          {
+            "name": "dimensionId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Topic"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/topics/{topicId}": {
+      "get": {
+        "summary": "Get a transformation topic",
+        "operationId": "getTopic",
+        "parameters": [
+          {
+            "name": "topicId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topic",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Topic"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/questionnaires/current": {
+      "get": {
+        "summary": "Get the current questionnaire",
+        "operationId": "getCurrentQuestionnaire",
+        "responses": {
+          "200": {
+            "description": "Published questionnaire",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Questionnaire"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/health/live": {
+      "get": {
+        "summary": "Check process liveness",
+        "operationId": "getLiveness",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Health"
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Check service readiness",
+        "operationId": "getReadiness",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Health"
+          },
+          "503": {
+            "$ref": "#/components/responses/Health"
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Expose Prometheus metrics",
+        "operationId": "getMetrics",
+        "responses": {
+          "200": {
+            "description": "Prometheus text exposition",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "components": {
-    "parameters": {"DimensionId": {"name": "dimensionId", "in": "path", "required": true, "schema": {"type": "string", "pattern": "^[a-z0-9-]+$"}}},
+    "parameters": {
+      "DimensionId": {
+        "name": "dimensionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        }
+      }
+    },
     "responses": {
-      "Error": {"description": "Machine-readable error", "content": {"application/problem+json": {"schema": {"$ref": "#/components/schemas/Problem"}}}},
-      "Health": {"description": "Health state", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}}
+      "Error": {
+        "description": "Machine-readable error",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Health": {
+        "description": "Health state",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Health"
+            }
+          }
+        }
+      }
     },
     "schemas": {
-      "Dimension": {"type": "object", "additionalProperties": false, "required": ["id", "title", "description"], "properties": {"id": {"type": "string", "pattern": "^[a-z0-9-]+$"}, "title": {"type": "string", "minLength": 1, "maxLength": 100}, "description": {"type": "string", "minLength": 1, "maxLength": 2000}}},
-      "Topic": {"type": "object", "additionalProperties": false, "required": ["id", "dimensionId", "title", "body"], "properties": {"id": {"type": "string"}, "dimensionId": {"type": "string"}, "title": {"type": "string"}, "body": {"type": "string"}}},
-      "Questionnaire": {"type": "object", "additionalProperties": false, "required": ["id", "version", "scoringVersion", "questions"], "properties": {"id": {"type": "string"}, "version": {"type": "string", "pattern": "^questionnaire-[0-9]+\\.[0-9]+\\.[0-9]+$"}, "scoringVersion": {"type": "string"}, "questions": {"type": "array", "minItems": 6, "items": {"$ref": "#/components/schemas/Question"}}}},
-      "Question": {"type": "object", "additionalProperties": false, "required": ["id", "dimensionId", "prompt", "options"], "properties": {"id": {"type": "string"}, "dimensionId": {"type": "string"}, "prompt": {"type": "string"}, "options": {"type": "array", "minItems": 2, "items": {"$ref": "#/components/schemas/ResponseOption"}}}},
-      "ResponseOption": {"type": "object", "additionalProperties": false, "required": ["id", "label", "value"], "properties": {"id": {"type": "string"}, "label": {"type": "string"}, "value": {"type": "integer", "minimum": 0, "maximum": 4}}},
-      "Problem": {"type": "object", "additionalProperties": false, "required": ["type", "title", "status", "code", "requestId"], "properties": {"type": {"type": "string", "format": "uri"}, "title": {"type": "string"}, "status": {"type": "integer", "minimum": 400, "maximum": 599}, "code": {"type": "string"}, "detail": {"type": "string"}, "requestId": {"type": "string"}, "errors": {"type": "array", "items": {"type": "object"}}}},
-      "Health": {"type": "object", "required": ["status"], "properties": {"status": {"type": "string", "enum": ["ok", "unavailable"]}, "checks": {"type": "object", "additionalProperties": {"type": "string"}}}}
+      "Dimension": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      },
+      "Topic": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "dimensionId",
+          "title",
+          "body"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "dimensionId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      },
+      "Questionnaire": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version",
+          "scoringVersion",
+          "questions"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^questionnaire-[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "scoringVersion": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "minItems": 6,
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          }
+        }
+      },
+      "Question": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "dimensionId",
+          "prompt",
+          "options"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "dimensionId": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/ResponseOption"
+            }
+          }
+        }
+      },
+      "ResponseOption": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "value"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "requestId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "detail",
+                "pointer"
+              ],
+              "properties": {
+                "detail": {
+                  "type": "string"
+                },
+                "pointer": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   }
 }

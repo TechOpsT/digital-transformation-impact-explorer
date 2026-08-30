@@ -8,7 +8,7 @@ The services need independent ownership without requiring multiple PostgreSQL cl
 
 ## Decision
 
-Use one PostgreSQL instance with separate `content`, `assessment`, and `recommendation` schemas and distinct least-privilege database roles. A service may access only its schema. Cross-service reads use versioned HTTP APIs. Redis holds only reconstructable cache entries with explicit TTLs.
+Use one PostgreSQL instance with separate `content` and `assessment` schemas and distinct least-privilege database roles. A service may access only its schema. Cross-service reads use versioned HTTP APIs. The recommendation service is stateless and owns version-controlled rules as established by ADR 0005. Redis holds only reconstructable cache entries with explicit TTLs.
 
 ## Alternatives considered
 
@@ -18,5 +18,4 @@ Use one PostgreSQL instance with separate `content`, `assessment`, and `recommen
 
 ## Consequences and trade-offs
 
-Schema isolation is economical for the lab but not a security boundary equivalent to separate instances. Cross-service workflows need explicit failure handling and cannot rely on database joins.
-
+Schema isolation is economical for the lab but not a security boundary equivalent to separate instances. Cross-service workflows need explicit failure handling and cannot rely on database joins. Recommendation availability does not depend on a third business-data schema.

@@ -1,0 +1,19 @@
+{
+  "name": "digital-transformation-impact-explorer-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phase 0 validation tooling for API contracts and architecture specifications",
+  "scripts": {
+    "lint": "node scripts/check-repository.mjs",
+    "contract:openapi": "redocly lint contracts/openapi/*.openapi.json --format=stylish",
+    "contract:domain": "node tests/contract/validate-contracts.mjs",
+    "contract-test": "npm run contract:openapi && npm run contract:domain",
+    "test": "node --test tests/unit/*.test.mjs"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.49.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

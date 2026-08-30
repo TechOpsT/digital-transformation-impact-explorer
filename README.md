@@ -45,7 +45,13 @@ Each phase ends with validation and an explicit approval boundary.
 
 ## Phase 0 validation
 
-The Phase 0 checks require Node.js 20+ and have no downloaded dependencies:
+The Phase 0 checks require Node.js 20+. Install the pinned validation dependency once:
+
+```bash
+npm ci
+```
+
+Then run:
 
 ```bash
 make lint
@@ -57,13 +63,13 @@ On Windows without `make`, run:
 
 ```powershell
 node scripts/check-repository.mjs
-node tests/contract/validate-contracts.mjs
+npm run contract-test
 node --test tests/unit/*.test.mjs
 ```
 
 ## Open decisions
 
-The ADRs under `docs/decisions/` are intentionally marked `Proposed`. Before Phase 1, approve or revise the backend framework, data ownership, migrations, and repository structure decisions.
+ADRs 0001–0004 remain `Proposed`; approve or revise the backend framework, data ownership, migrations, and repository structure before Phase 1. ADR 0005 is `Accepted` and establishes immutable recommendation snapshots owned by assessment results.
 
 ## Security and privacy
 
@@ -72,4 +78,3 @@ The MVP is anonymous and must not collect unnecessary personal or organizational
 ## License
 
 License selection is deferred until the intended publication model is confirmed and must be completed before public release.
-

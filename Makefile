@@ -9,11 +9,10 @@ lint:
 	node scripts/check-repository.mjs
 
 contract-test:
-	node tests/contract/validate-contracts.mjs
+	npm run contract-test
 
 test:
 	node --test tests/unit/*.test.mjs
 
 setup run build integration-test helm-lint:
 	@echo "$@ is not available in Phase 0" && exit 2
-

@@ -1,0 +1,16 @@
+{
+  "type": "https://example.invalid/problems/questionnaire-version-mismatch",
+  "title": "Questionnaire version mismatch",
+  "status": 422,
+  "code": "questionnaire-version-mismatch",
+  "detail": "The submitted responses do not belong to the assessment questionnaire version.",
+  "instance": "/api/v1/assessments/48e3abf2-614c-44b5-aa00-2a27c6351517/responses",
+  "requestId": "346a1af4-67d3-4a38-a516-f29abb24c6b0",
+  "errors": [
+    {
+      "detail": "Question does not exist in questionnaire-1.0.0.",
+      "pointer": "/responses/0/questionId"
+    }
+  ]
+}
+

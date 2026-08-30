@@ -18,8 +18,8 @@ Questionnaires, scoring policies, maturity ranges, and recommendation rule sets 
 | AssessmentResponse | Assessment | assessmentId, questionId, optionId, value | One current response per question; value is snapshotted |
 | DimensionScore | Assessment | dimensionId, raw, possible, normalized | Normalized score is 0–100 |
 | AssessmentResult | Assessment | id, versions, scores, maturityLevel | Immutable after completion |
-| RecommendationRule | Recommendation | id, ruleSetVersion, conditions, action | Deterministic and immutable within a published rule set |
-| Recommendation | Recommendation | id, ruleId, priority, rationale, action | Traceable to a rule and input score |
+| RecommendationRule | Recommendation | id, ruleSetVersion, conditions, action | Version-controlled, deterministic, and immutable within a published rule set |
+| Recommendation | Assessment result | ruleId, dimensionId, triggerScore, priority, rationale, action | Immutable value object traceable to its rule and input score |
 
 ## Identifiers and time
 
@@ -32,7 +32,8 @@ Questionnaires, scoring policies, maturity ranges, and recommendation rule sets 
 
 - Content publishes definitions; it does not store user assessment state.
 - Assessment validates question and option references against a fixed questionnaire version, calculates and persists scores, and orchestrates recommendation evaluation.
-- Recommendation evaluates versioned rules from supplied scores; it never queries assessment tables.
+- Recommendation is a stateless evaluator of version-controlled rules from supplied scores; it never queries assessment tables or persists evaluations.
+- Assessment snapshots complete recommendation value objects into the immutable completed result.
 - The frontend owns no persistent business data and contains no scoring logic.
 
 ## Assessment lifecycle
@@ -44,4 +45,3 @@ COMPLETED --any mutation--> rejected
 ```
 
 Completion requires one valid response for every required question. Repeated response submission is idempotent for the same assessment and question. Completion is idempotent and returns the existing immutable result after success.
-
