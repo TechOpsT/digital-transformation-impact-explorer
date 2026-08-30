@@ -1,6 +1,16 @@
 # ADR 0002: Data ownership
 
-- Status: Proposed
+- Status: Accepted
+- Date: 2026-08-30
+- Decision owner: Repository owner
+
+## Decision drivers
+
+- Explicit service ownership and least privilege
+- Affordable local-lab resource use
+- No cross-service database coupling
+- Explainable historical assessment results
+- Reconstructable caching only
 
 ## Context
 
@@ -19,3 +29,10 @@ Use one PostgreSQL instance with separate `content` and `assessment` schemas and
 ## Consequences and trade-offs
 
 Schema isolation is economical for the lab but not a security boundary equivalent to separate instances. Cross-service workflows need explicit failure handling and cannot rely on database joins. Recommendation availability does not depend on a third business-data schema.
+
+## Confirmation
+
+- Integration tests use distinct database roles and prove cross-schema access is denied.
+- No service code or migration references another service's schema.
+- Assessment results snapshot all policy versions and recommendation values required for retrieval.
+- Redis loss does not remove durable business data or prevent recovery from PostgreSQL.

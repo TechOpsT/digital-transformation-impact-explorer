@@ -1,6 +1,16 @@
 # ADR 0003: Migration tooling
 
-- Status: Proposed
+- Status: Accepted
+- Date: 2026-08-30
+- Decision owner: Repository owner
+
+## Decision drivers
+
+- Deliberate, observable schema changes
+- Independent ownership by data-owning services
+- Safe execution with multiple application replicas
+- Reproducible local and Kubernetes workflows
+- Support for expand-and-contract compatibility
 
 ## Context
 
@@ -20,3 +30,9 @@ Use Alembic per data-owning service. Store migrations with each service and run 
 
 Each service owns a separate migration history. Delivery must sequence compatible expand-and-contract migrations before application rollout.
 
+## Confirmation
+
+- Application startup never invokes Alembic upgrades.
+- Local and deployment workflows expose migrations as a separate explicit step.
+- Runtime database roles cannot execute schema changes.
+- Integration tests build an empty database from migrations before loading deterministic seed data.

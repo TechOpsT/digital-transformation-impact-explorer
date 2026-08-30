@@ -8,6 +8,14 @@
 
 The recommendation service deterministically evaluates versioned rules from assessment scores. The initial API outline also allowed an individual recommendation to be retrieved by a generated identifier, but the MVP has no independent recommendation workflow, assignment, or lifecycle. Persisting recommendations in two services would create ambiguous ownership and risk historical results changing when rules evolve.
 
+## Decision drivers
+
+- Immutable and explainable historical results
+- One clear owner for the user-facing result
+- Deterministic, horizontally scalable evaluation
+- No persistence without an independent business lifecycle
+- Stable traceability from recommendations to versioned rules
+
 ## Decision
 
 The recommendation service is a stateless evaluator. It owns version-controlled rule definitions but no runtime business data. On completion, the assessment service sends dimension scores and explicit policy versions for evaluation, then stores the returned recommendations as value objects inside the immutable assessment result.
@@ -30,4 +38,3 @@ Completed results remain stable and independently retrievable. The recommendatio
 - Recommendation response objects have `ruleId` but no generated `id`.
 - Assessment result contracts embed complete recommendation snapshots.
 - Phase 1 tests verify that a stored result is unchanged after rule definitions change.
-

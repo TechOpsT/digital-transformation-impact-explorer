@@ -1,6 +1,16 @@
 # ADR 0004: Repository structure
 
-- Status: Proposed
+- Status: Accepted
+- Date: 2026-08-30
+- Decision owner: Repository owner
+
+## Decision drivers
+
+- Atomic contract and consumer changes during early development
+- Independently buildable and deployable components
+- One discoverable portfolio narrative
+- Clear separation from shared platform lifecycle
+- Reviewable CI and GitOps boundaries
 
 ## Context
 
@@ -19,3 +29,9 @@ Use a monorepo containing the frontend, three backend services, OpenAPI contract
 
 Atomic contract and consumer changes are easy, but CI must preserve independent build boundaries and path-aware validation as the repository grows.
 
+## Confirmation
+
+- Each deployable component has its own dependency manifest, tests, Dockerfile, and image target.
+- CI can validate and build a component without building unrelated services.
+- The application Helm chart consumes independently versioned images.
+- No shared cluster controller or platform-wide configuration is added to this repository.

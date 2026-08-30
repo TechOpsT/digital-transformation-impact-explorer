@@ -20,6 +20,8 @@ const required = [
   "docs/decisions/0003-migration-tooling.md",
   "docs/decisions/0004-repository-structure.md",
   "docs/decisions/0005-recommendation-lifecycle.md",
+  "docs/decisions/0006-definition-source-and-seeding.md",
+  "docs/evidence/phase-0-completion.md",
   "contracts/openapi/README.md",
   "contracts/examples/assessment-result.json",
   "contracts/examples/problem.json",
@@ -35,6 +37,11 @@ for (const path of required.filter((path) => path.includes("docs/decisions/"))) 
   const content = readFileSync(resolve(root, path), "utf8");
   for (const heading of ["Status", "Context", "Decision", "Alternatives considered", "Consequences and trade-offs"]) {
     if (!content.includes(heading)) throw new Error(`${path} is missing ${heading}`);
+  }
+  if (content.includes("Status: Accepted")) {
+    for (const field of ["Date:", "Decision owner:", "Decision drivers", "Confirmation"]) {
+      if (!content.includes(field)) throw new Error(`${path} accepted decision is missing ${field}`);
+    }
   }
 }
 

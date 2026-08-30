@@ -4,7 +4,7 @@ A cloud-native learning and assessment application that explains how digital tra
 
 ## Status
 
-**Phase 0 — Architecture and contracts.** No runtime application has been implemented yet. Proposed foundational decisions require approval before Phase 1.
+**Phase 0 complete — awaiting approval to begin Phase 1.** Architecture, domain and scoring specifications, user flows, service contracts, accepted foundational decisions, validation tooling, and reproducible evidence are present. No runtime application has been implemented yet.
 
 ## Product scope
 
@@ -67,9 +67,9 @@ npm run contract-test
 node --test tests/unit/*.test.mjs
 ```
 
-## Open decisions
+## Architecture decisions
 
-ADRs 0001–0004 remain `Proposed`; approve or revise the backend framework, data ownership, migrations, and repository structure before Phase 1. ADR 0005 is `Accepted` and establishes immutable recommendation snapshots owned by assessment results.
+ADRs 0001–0006 are accepted. They establish the backend framework, data ownership, migration tooling, repository structure, immutable recommendation snapshots, and version-controlled definition seeding. Remaining questions are intentionally deferred to their documented decision boundaries.
 
 ## Security and privacy
 
