@@ -3,6 +3,7 @@
 !.env.example
 node_modules/
 .venv/
+.locks/
 venv/
 __pycache__/
 .pytest_cache/
@@ -10,7 +11,7 @@ coverage/
 dist/
 build/
 *.log
+*.tsbuildinfo
 .DS_Store
 .idea/
 .vscode/
-

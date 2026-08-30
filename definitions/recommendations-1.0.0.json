@@ -1,0 +1,11 @@
+{
+  "version": "recommendations-1.0.0",
+  "rules": [
+    {"id": "software-delivery-foundation", "dimensionId": "software-delivery", "rationale": "Delivery flow is limiting the speed and safety of change.", "action": "Map one value stream and automate its build, test, and deployment path."},
+    {"id": "reliability-and-operations-foundation", "dimensionId": "reliability-and-operations", "rationale": "Operational feedback is not yet consistently shaping improvement.", "action": "Define one user-focused service indicator and review it with every release."},
+    {"id": "security-and-governance-foundation", "dimensionId": "security-and-governance", "rationale": "Security controls are creating late feedback or inconsistent coverage.", "action": "Add automated dependency and container scanning with an explicit severity policy."},
+    {"id": "data-and-decision-making-foundation", "dimensionId": "data-and-decision-making", "rationale": "Decision quality is constrained by inconsistent or delayed information.", "action": "Choose one critical outcome and publish its owner, definition, source, and freshness."},
+    {"id": "developer-experience-foundation", "dimensionId": "developer-experience", "rationale": "Developer friction is consuming time that could create customer value.", "action": "Measure the path from repository creation to first production deployment and remove its largest delay."},
+    {"id": "organizational-culture-foundation", "dimensionId": "organizational-culture", "rationale": "Learning and adaptation are not yet consistently reinforced.", "action": "Run a blameless learning review and track one systemic improvement to completion."}
+  ]
+}

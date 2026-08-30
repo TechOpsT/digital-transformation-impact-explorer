@@ -1,0 +1,5 @@
+-r content-service/requirements.txt
+-r assessment-service/requirements.txt
+-r recommendation-service/requirements.txt
+pytest==9.1.1
+httpx==0.28.1

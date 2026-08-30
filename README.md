@@ -4,7 +4,7 @@ A cloud-native learning and assessment application that explains how digital tra
 
 ## Status
 
-**Phase 0 complete — awaiting approval to begin Phase 1.** Architecture, domain and scoring specifications, user flows, service contracts, accepted foundational decisions, validation tooling, and reproducible evidence are present. No runtime application has been implemented yet.
+**Phase 1 — walking skeleton in development.** The repository contains the React interface, three FastAPI services, versioned definitions, PostgreSQL migrations, deterministic seeding, Redis caching, and the first end-to-end assessment workflow.
 
 ## Product scope
 
@@ -43,29 +43,52 @@ tests/contract/                   Contract validation
 
 Each phase ends with validation and an explicit approval boundary.
 
-## Phase 0 validation
+## Local development
 
-The Phase 0 checks require Node.js 20+. Install the pinned validation dependency once:
+Requirements: Node.js 20+, Docker Desktop with Compose, and GNU Make where available. Create an ignored local environment file and replace every placeholder:
+
+```bash
+cp .env.example .env
+```
+
+Install pinned JavaScript dependencies:
 
 ```bash
 npm ci
 ```
 
-Then run:
+Start the complete local application:
+
+```bash
+docker compose up --build
+```
+
+Open `http://localhost:5173`. The service APIs are exposed on ports 8001–8003 for local inspection.
+
+## Validation
+
+The repository interface is:
 
 ```bash
 make lint
 make contract-test
 make test
+make build
+make integration-test
 ```
 
-On Windows without `make`, run:
+On Windows without `make`, the equivalent frontend and static checks include:
 
 ```powershell
 node scripts/check-repository.mjs
 npm run contract-test
 node --test tests/unit/*.test.mjs
+npm run lint --prefix apps/web
+npm test --prefix apps/web
+npm run build --prefix apps/web
 ```
+
+Backend and integration tests run in Docker so a host Python installation is not required.
 
 ## Architecture decisions
 

@@ -1,0 +1,19 @@
+{
+  "version": "content-1.0.0",
+  "dimensions": [
+    {"id": "software-delivery", "title": "Software delivery", "description": "How quickly and safely ideas move from discovery into dependable customer value."},
+    {"id": "reliability-and-operations", "title": "Reliability and operations", "description": "How teams understand, operate, recover, and learn from production systems."},
+    {"id": "security-and-governance", "title": "Security and governance", "description": "How risk controls become automated, visible, and integrated into everyday delivery."},
+    {"id": "data-and-decision-making", "title": "Data and decision-making", "description": "How trustworthy information shapes product, operational, and investment choices."},
+    {"id": "developer-experience", "title": "Developer experience", "description": "How effectively teams can discover, build, test, ship, and operate software."},
+    {"id": "organizational-culture", "title": "Organizational culture", "description": "How leadership, incentives, learning, and team boundaries support continuous change."}
+  ],
+  "topics": [
+    {"id": "flow-and-feedback", "dimensionId": "software-delivery", "title": "Flow and feedback", "body": "Small batches and fast feedback reduce delivery risk."},
+    {"id": "operational-learning", "dimensionId": "reliability-and-operations", "title": "Operational learning", "body": "Incidents become inputs to safer systems and better decisions."},
+    {"id": "controls-as-code", "dimensionId": "security-and-governance", "title": "Controls as code", "body": "Automated guardrails make secure paths repeatable and visible."},
+    {"id": "decision-quality", "dimensionId": "data-and-decision-making", "title": "Decision quality", "body": "Shared definitions and reliable data improve the quality and speed of decisions."},
+    {"id": "platform-as-product", "dimensionId": "developer-experience", "title": "Platform as a product", "body": "Golden paths reduce cognitive load without removing team autonomy."},
+    {"id": "learning-systems", "dimensionId": "organizational-culture", "title": "Learning systems", "body": "Psychological safety and clear outcomes help teams adapt continuously."}
+  ]
+}

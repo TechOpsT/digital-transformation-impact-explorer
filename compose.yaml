@@ -1,0 +1,121 @@
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: transformation
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?Set POSTGRES_SUPERUSER_PASSWORD in .env}
+      CONTENT_DATABASE_PASSWORD: ${CONTENT_DATABASE_PASSWORD:?Set CONTENT_DATABASE_PASSWORD in .env}
+      ASSESSMENT_DATABASE_PASSWORD: ${ASSESSMENT_DATABASE_PASSWORD:?Set ASSESSMENT_DATABASE_PASSWORD in .env}
+      MIGRATION_DATABASE_PASSWORD: ${MIGRATION_DATABASE_PASSWORD:?Set MIGRATION_DATABASE_PASSWORD in .env}
+    ports: ["5432:5432"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d transformation"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8.2.1-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  content-migrate:
+    build:
+      context: .
+      dockerfile: services/content-service/Dockerfile
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      CONTENT_MIGRATION_DATABASE_URL: postgresql+psycopg://content_migrator:${MIGRATION_DATABASE_PASSWORD}@postgres:5432/transformation
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  content-seed:
+    build:
+      context: .
+      dockerfile: services/content-service/Dockerfile
+    command: ["python", "-m", "app.seed"]
+    environment:
+      CONTENT_DATABASE_URL: postgresql+psycopg://content:${CONTENT_DATABASE_PASSWORD}@postgres:5432/transformation
+      CONTENT_DEFINITIONS_DIR: /app/definitions
+    depends_on:
+      content-migrate: {condition: service_completed_successfully}
+
+  assessment-migrate:
+    build:
+      context: .
+      dockerfile: services/assessment-service/Dockerfile
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      ASSESSMENT_MIGRATION_DATABASE_URL: postgresql+psycopg://assessment_migrator:${MIGRATION_DATABASE_PASSWORD}@postgres:5432/transformation
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  content-service:
+    build:
+      context: .
+      dockerfile: services/content-service/Dockerfile
+    environment:
+      CONTENT_DATABASE_URL: postgresql+psycopg://content:${CONTENT_DATABASE_PASSWORD}@postgres:5432/transformation
+      CONTENT_DEFINITIONS_DIR: /app/definitions
+    ports: ["8001:8001"]
+    depends_on:
+      content-seed: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  recommendation-service:
+    build:
+      context: .
+      dockerfile: services/recommendation-service/Dockerfile
+    ports: ["8003:8003"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  assessment-service:
+    build:
+      context: .
+      dockerfile: services/assessment-service/Dockerfile
+    environment:
+      ASSESSMENT_DATABASE_URL: postgresql+psycopg://assessment:${ASSESSMENT_DATABASE_PASSWORD}@postgres:5432/transformation
+      ASSESSMENT_REDIS_URL: redis://redis:6379/0
+      ASSESSMENT_CONTENT_URL: http://content-service:8001
+      ASSESSMENT_RECOMMENDATION_URL: http://recommendation-service:8003
+    ports: ["8002:8002"]
+    depends_on:
+      assessment-migrate: {condition: service_completed_successfully}
+      content-service: {condition: service_healthy}
+      recommendation-service: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      CONTENT_PROXY_TARGET: http://content-service:8001
+      ASSESSMENT_PROXY_TARGET: http://assessment-service:8002
+    ports: ["5173:4173"]
+    depends_on:
+      assessment-service: {condition: service_healthy}
+
+volumes:
+  postgres-data:

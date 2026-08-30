@@ -6,9 +6,11 @@
   "scripts": {
     "lint": "node scripts/check-repository.mjs",
     "contract:openapi": "redocly lint contracts/openapi/*.openapi.json --format=stylish",
-    "contract:domain": "node tests/contract/validate-contracts.mjs",
+    "contract:domain": "node tests/contract/validate-contracts.mjs && node tests/contract/validate-definitions.mjs",
     "contract-test": "npm run contract:openapi && npm run contract:domain",
-    "test": "node --test tests/unit/*.test.mjs"
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:web": "npm test --prefix apps/web",
+    "build:web": "npm run build --prefix apps/web"
   },
   "devDependencies": {
     "@redocly/cli": "2.49.0"

@@ -1,0 +1,47 @@
+name: Phase 1 validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      POSTGRES_SUPERUSER_PASSWORD: ci-postgres-only
+      CONTENT_DATABASE_PASSWORD: ci-content-only
+      ASSESSMENT_DATABASE_PASSWORD: ci-assessment-only
+      MIGRATION_DATABASE_PASSWORD: ci-migration-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.17.0
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/web/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix apps/web
+      - run: npm run lint
+      - run: npm run contract-test
+      - run: npm test
+      - run: npm run lint --prefix apps/web
+      - run: npm test --prefix apps/web
+      - run: npm run build --prefix apps/web
+      - run: docker build --target test --tag content-test --file services/content-service/Dockerfile .
+      - run: docker run --rm content-test
+      - run: docker build --target test --tag assessment-test --file services/assessment-service/Dockerfile .
+      - run: docker run --rm assessment-test
+      - run: docker build --target test --tag recommendation-test --file services/recommendation-service/Dockerfile .
+      - run: docker run --rm recommendation-test
+      - run: docker compose up --detach --build --wait
+      - run: node tests/contract/runtime-contracts.mjs
+      - run: node tests/integration/walking-skeleton.mjs
+      - if: always()
+        run: docker compose down --volumes
