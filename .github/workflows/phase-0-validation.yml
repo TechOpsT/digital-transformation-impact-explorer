@@ -1,0 +1,28 @@
+name: Phase 0 validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check repository conventions
+        run: node scripts/check-repository.mjs
+      - name: Validate OpenAPI contracts
+        run: node tests/contract/validate-contracts.mjs
+      - name: Test scoring specification examples
+        run: node --test tests/unit/*.test.mjs
+

@@ -1,0 +1,31 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Content Service API", "version": "1.0.0"},
+  "servers": [{"url": "/"}],
+  "paths": {
+    "/api/v1/dimensions": {"get": {"operationId": "listDimensions", "responses": {"200": {"description": "Dimensions", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Dimension"}}}}}, "default": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/dimensions/{dimensionId}": {"get": {"operationId": "getDimension", "parameters": [{"$ref": "#/components/parameters/DimensionId"}], "responses": {"200": {"description": "Dimension", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Dimension"}}}}, "404": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/topics": {"get": {"operationId": "listTopics", "parameters": [{"name": "dimensionId", "in": "query", "schema": {"type": "string", "pattern": "^[a-z0-9-]+$"}}], "responses": {"200": {"description": "Topics", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Topic"}}}}}, "default": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/topics/{topicId}": {"get": {"operationId": "getTopic", "parameters": [{"name": "topicId", "in": "path", "required": true, "schema": {"type": "string", "pattern": "^[a-z0-9-]+$"}}], "responses": {"200": {"description": "Topic", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Topic"}}}}, "404": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/questionnaires/current": {"get": {"operationId": "getCurrentQuestionnaire", "responses": {"200": {"description": "Published questionnaire", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Questionnaire"}}}}, "503": {"$ref": "#/components/responses/Error"}}}},
+    "/health/live": {"get": {"operationId": "getLiveness", "responses": {"200": {"$ref": "#/components/responses/Health"}}}},
+    "/health/ready": {"get": {"operationId": "getReadiness", "responses": {"200": {"$ref": "#/components/responses/Health"}, "503": {"$ref": "#/components/responses/Health"}}}},
+    "/metrics": {"get": {"operationId": "getMetrics", "responses": {"200": {"description": "Prometheus text exposition", "content": {"text/plain": {"schema": {"type": "string"}}}}}}}
+  },
+  "components": {
+    "parameters": {"DimensionId": {"name": "dimensionId", "in": "path", "required": true, "schema": {"type": "string", "pattern": "^[a-z0-9-]+$"}}},
+    "responses": {
+      "Error": {"description": "Machine-readable error", "content": {"application/problem+json": {"schema": {"$ref": "#/components/schemas/Problem"}}}},
+      "Health": {"description": "Health state", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}}
+    },
+    "schemas": {
+      "Dimension": {"type": "object", "additionalProperties": false, "required": ["id", "title", "description"], "properties": {"id": {"type": "string", "pattern": "^[a-z0-9-]+$"}, "title": {"type": "string", "minLength": 1, "maxLength": 100}, "description": {"type": "string", "minLength": 1, "maxLength": 2000}}},
+      "Topic": {"type": "object", "additionalProperties": false, "required": ["id", "dimensionId", "title", "body"], "properties": {"id": {"type": "string"}, "dimensionId": {"type": "string"}, "title": {"type": "string"}, "body": {"type": "string"}}},
+      "Questionnaire": {"type": "object", "additionalProperties": false, "required": ["id", "version", "scoringVersion", "questions"], "properties": {"id": {"type": "string"}, "version": {"type": "string", "pattern": "^questionnaire-[0-9]+\\.[0-9]+\\.[0-9]+$"}, "scoringVersion": {"type": "string"}, "questions": {"type": "array", "minItems": 6, "items": {"$ref": "#/components/schemas/Question"}}}},
+      "Question": {"type": "object", "additionalProperties": false, "required": ["id", "dimensionId", "prompt", "options"], "properties": {"id": {"type": "string"}, "dimensionId": {"type": "string"}, "prompt": {"type": "string"}, "options": {"type": "array", "minItems": 2, "items": {"$ref": "#/components/schemas/ResponseOption"}}}},
+      "ResponseOption": {"type": "object", "additionalProperties": false, "required": ["id", "label", "value"], "properties": {"id": {"type": "string"}, "label": {"type": "string"}, "value": {"type": "integer", "minimum": 0, "maximum": 4}}},
+      "Problem": {"type": "object", "additionalProperties": false, "required": ["type", "title", "status", "code", "requestId"], "properties": {"type": {"type": "string", "format": "uri"}, "title": {"type": "string"}, "status": {"type": "integer", "minimum": 400, "maximum": 599}, "code": {"type": "string"}, "detail": {"type": "string"}, "requestId": {"type": "string"}, "errors": {"type": "array", "items": {"type": "object"}}}},
+      "Health": {"type": "object", "required": ["status"], "properties": {"status": {"type": "string", "enum": ["ok", "unavailable"]}, "checks": {"type": "object", "additionalProperties": {"type": "string"}}}}
+    }
+  }
+}

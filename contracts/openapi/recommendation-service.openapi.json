@@ -1,0 +1,21 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Recommendation Service API", "version": "1.0.0"},
+  "paths": {
+    "/api/v1/recommendations/evaluate": {"post": {"operationId": "evaluateRecommendations", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EvaluationRequest"}}}}, "responses": {"200": {"description": "Deterministic recommendations", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Evaluation"}}}}, "422": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/recommendations/{recommendationId}": {"get": {"operationId": "getRecommendation", "parameters": [{"name": "recommendationId", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}], "responses": {"200": {"description": "Recommendation", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Recommendation"}}}}, "404": {"$ref": "#/components/responses/Error"}}}},
+    "/health/live": {"get": {"operationId": "getLiveness", "responses": {"200": {"$ref": "#/components/responses/Health"}}}},
+    "/health/ready": {"get": {"operationId": "getReadiness", "responses": {"200": {"$ref": "#/components/responses/Health"}, "503": {"$ref": "#/components/responses/Health"}}}},
+    "/metrics": {"get": {"operationId": "getMetrics", "responses": {"200": {"description": "Prometheus metrics", "content": {"text/plain": {"schema": {"type": "string"}}}}}}}
+  },
+  "components": {
+    "responses": {"Error": {"description": "Machine-readable error", "content": {"application/problem+json": {"schema": {"$ref": "#/components/schemas/Problem"}}}}, "Health": {"description": "Health state", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}}},
+    "schemas": {
+      "EvaluationRequest": {"type": "object", "additionalProperties": false, "required": ["assessmentId", "ruleSetVersion", "maturityLevel", "dimensionScores"], "properties": {"assessmentId": {"type": "string", "format": "uuid"}, "ruleSetVersion": {"type": "string", "pattern": "^recommendations-[0-9]+\\.[0-9]+\\.[0-9]+$"}, "maturityLevel": {"type": "string"}, "dimensionScores": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "object", "additionalProperties": false, "required": ["dimensionId", "normalized"], "properties": {"dimensionId": {"type": "string"}, "normalized": {"type": "number", "minimum": 0, "maximum": 100}}}}}},
+      "Evaluation": {"type": "object", "additionalProperties": false, "required": ["ruleSetVersion", "recommendations"], "properties": {"ruleSetVersion": {"type": "string"}, "recommendations": {"type": "array", "minItems": 3, "maxItems": 5, "items": {"$ref": "#/components/schemas/Recommendation"}}}},
+      "Recommendation": {"type": "object", "additionalProperties": false, "required": ["id", "ruleId", "dimensionId", "triggerScore", "priority", "rationale", "action"], "properties": {"id": {"type": "string", "format": "uuid"}, "ruleId": {"type": "string"}, "dimensionId": {"type": "string"}, "triggerScore": {"type": "number", "minimum": 0, "maximum": 100}, "priority": {"type": "integer", "minimum": 1, "maximum": 5}, "rationale": {"type": "string", "minLength": 1}, "action": {"type": "string", "minLength": 1}}},
+      "Problem": {"type": "object", "required": ["type", "title", "status", "code", "requestId"], "properties": {"type": {"type": "string", "format": "uri"}, "title": {"type": "string"}, "status": {"type": "integer"}, "code": {"type": "string"}, "detail": {"type": "string"}, "requestId": {"type": "string"}}},
+      "Health": {"type": "object", "required": ["status"], "properties": {"status": {"type": "string", "enum": ["ok", "unavailable"]}, "checks": {"type": "object", "additionalProperties": {"type": "string"}}}}
+    }
+  }
+}
