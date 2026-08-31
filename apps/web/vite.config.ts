@@ -6,6 +6,7 @@ export default defineConfig({
   preview: {
     host: "0.0.0.0",
     port: 4173,
+    allowedHosts: ["transformation.local", "web"],
     proxy: {
       "/api/content": { target: process.env.CONTENT_PROXY_TARGET ?? "http://localhost:8001", rewrite: (path) => path.replace(/^\/api\/content/, "/api/v1") },
       "/api/assessments": { target: process.env.ASSESSMENT_PROXY_TARGET ?? "http://localhost:8002", rewrite: (path) => path.replace(/^\/api\/assessments/, "/api/v1/assessments") }

@@ -1,0 +1,32 @@
+{{- if .Values.monitoring.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: transformation-explorer
+  namespace: {{ .Values.monitoring.serviceMonitor.namespace }}
+  labels:
+    release: {{ .Values.monitoring.serviceMonitor.releaseLabel }}
+    {{- include "transformation-explorer.labels" . | nindent 4 }}
+spec:
+  namespaceSelector:
+    matchNames: [{{ include "transformation-explorer.namespace" . }}]
+  selector:
+    matchLabels:
+      transformation-explorer/metrics: "true"
+  endpoints:
+    - { port: http, path: /metrics, interval: 30s, scrapeTimeout: 10s }
+{{- end }}
+---
+{{- if .Values.monitoring.dashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transformation-explorer-dashboard
+  namespace: {{ .Values.monitoring.dashboard.namespace }}
+  labels:
+    grafana_dashboard: "1"
+    {{- include "transformation-explorer.labels" . | nindent 4 }}
+data:
+  transformation-explorer.json: |-
+    {"annotations":{"list":[]},"editable":true,"panels":[{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"unit":"reqps"}},"gridPos":{"h":8,"w":12,"x":0,"y":0},"id":1,"targets":[{"expr":"sum(rate(http_requests_total{namespace=\"transformation-explorer\"}[5m])) by (service)","legendFormat":"{{`{{service}}`}}"}],"title":"Request rate by service","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"gridPos":{"h":8,"w":12,"x":12,"y":0},"id":2,"targets":[{"expr":"sum(rate(http_requests_total{namespace=\"transformation-explorer\",status_class=~\"5..\"}[5m])) by (service)","legendFormat":"{{`{{service}}`}}"}],"title":"Server errors","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"gridPos":{"h":8,"w":12,"x":0,"y":8},"id":3,"targets":[{"expr":"sum(increase(assessment_completions_total[1h]))","legendFormat":"completed"}],"title":"Assessment completions","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"gridPos":{"h":8,"w":12,"x":12,"y":8},"id":4,"targets":[{"expr":"sum(increase(recommendation_evaluations_total[1h])) by (status)","legendFormat":"{{`{{status}}`}}"}],"title":"Recommendation evaluations","type":"timeseries"}],"schemaVersion":41,"tags":["transformation-explorer","phase-2"],"templating":{"list":[]},"time":{"from":"now-6h","to":"now"},"title":"Digital Transformation Impact Explorer","uid":"transformation-explorer"}
+{{- end }}

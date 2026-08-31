@@ -1,0 +1,130 @@
+{{- $components := dict
+  "web" (dict "port" 4173 "image" .Values.images.web "replicas" .Values.replicas.web "resources" .Values.resources.web)
+  "content" (dict "port" 8001 "image" .Values.images.content "replicas" .Values.replicas.content "resources" .Values.resources.content)
+  "assessment" (dict "port" 8002 "image" .Values.images.assessment "replicas" .Values.replicas.assessment "resources" .Values.resources.assessment)
+  "recommendation" (dict "port" 8003 "image" .Values.images.recommendation "replicas" .Values.replicas.recommendation "resources" .Values.resources.recommendation)
+-}}
+{{- range $name, $cfg := $components }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ include "transformation-explorer.namespace" $ }}
+  labels:
+    {{- include "transformation-explorer.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  replicas: {{ $cfg.replicas }}
+  revisionHistoryLimit: {{ $.Values.revisionHistoryLimit }}
+  strategy: { type: RollingUpdate, rollingUpdate: { maxUnavailable: 0, maxSurge: 1 } }
+  selector:
+    matchLabels:
+      {{- include "transformation-explorer.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $name }}
+  template:
+    metadata:
+      labels:
+        {{- include "transformation-explorer.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $name }}
+        {{- if ne $name "web" }}
+        transformation-explorer/metrics: "true"
+        {{- end }}
+    spec:
+      serviceAccountName: transformation-explorer-{{ $name }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ if eq $name "web" }}1000{{ else }}10001{{ end }}
+        runAsGroup: {{ if eq $name "web" }}1000{{ else }}10001{{ end }}
+        fsGroup: {{ if eq $name "web" }}1000{{ else }}10001{{ end }}
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: {{ $name }}
+          image: "{{ $cfg.image.repository }}:{{ $cfg.image.tag }}"
+          imagePullPolicy: {{ $cfg.image.pullPolicy }}
+          securityContext:
+            {{- include "transformation-explorer.securityContext" $ | nindent 12 }}
+            runAsUser: {{ if eq $name "web" }}1000{{ else }}10001{{ end }}
+            runAsGroup: {{ if eq $name "web" }}1000{{ else }}10001{{ end }}
+          {{- if eq $name "content" }}
+          command: ["/bin/sh", "-c"]
+          args: ['export CONTENT_DATABASE_URL="postgresql+psycopg://content:${CONTENT_DATABASE_PASSWORD}@postgres:5432/{{ $.Values.database.name }}"; exec uvicorn app.main:app --host 0.0.0.0 --port 8001 --no-access-log']
+          env:
+            - name: CONTENT_DATABASE_PASSWORD
+              valueFrom: { secretKeyRef: { name: {{ $.Values.database.existingSecret }}, key: CONTENT_DATABASE_PASSWORD } }
+          {{- else if eq $name "assessment" }}
+          command: ["/bin/sh", "-c"]
+          args: ['export ASSESSMENT_DATABASE_URL="postgresql+psycopg://assessment:${ASSESSMENT_DATABASE_PASSWORD}@postgres:5432/{{ $.Values.database.name }}"; exec uvicorn app.main:app --host 0.0.0.0 --port 8002 --no-access-log']
+          env:
+            - name: ASSESSMENT_DATABASE_PASSWORD
+              valueFrom: { secretKeyRef: { name: {{ $.Values.database.existingSecret }}, key: ASSESSMENT_DATABASE_PASSWORD } }
+            - { name: ASSESSMENT_REDIS_URL, value: "redis://redis:6379/0" }
+            - { name: ASSESSMENT_CONTENT_URL, value: "http://content:8001" }
+            - { name: ASSESSMENT_RECOMMENDATION_URL, value: "http://recommendation:8003" }
+          {{- else if eq $name "web" }}
+          env:
+            - { name: CONTENT_PROXY_TARGET, value: "http://content:8001" }
+            - { name: ASSESSMENT_PROXY_TARGET, value: "http://assessment:8002" }
+          {{- end }}
+          ports: [{ name: http, containerPort: {{ $cfg.port }} }]
+          resources:
+            {{- toYaml $cfg.resources | nindent 12 }}
+          startupProbe:
+            httpGet: { path: {{ if eq $name "web" }} / {{ else }} /health/live {{ end }}, port: http }
+            periodSeconds: 3
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: { path: {{ if eq $name "web" }} / {{ else }} /health/ready {{ end }}, port: http }
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet: { path: {{ if eq $name "web" }} / {{ else }} /health/live {{ end }}, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+            {{- if eq $name "web" }}
+            - { name: vite-temp, mountPath: /app/node_modules/.vite-temp }
+            {{- end }}
+      volumes:
+        - { name: tmp, emptyDir: {} }
+        {{- if eq $name "web" }}
+        - { name: vite-temp, emptyDir: {} }
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  namespace: {{ include "transformation-explorer.namespace" $ }}
+  labels:
+    {{- include "transformation-explorer.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+    {{- if ne $name "web" }}
+    transformation-explorer/metrics: "true"
+    {{- end }}
+spec:
+  selector:
+    {{- include "transformation-explorer.selectorLabels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+  ports: [{ name: http, port: {{ if eq $name "web" }}80{{ else }}{{ $cfg.port }}{{ end }}, targetPort: http }]
+---
+{{- if and $.Values.podDisruptionBudgets.enabled (gt (int $cfg.replicas) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}
+  namespace: {{ include "transformation-explorer.namespace" $ }}
+  labels:
+    {{- include "transformation-explorer.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  minAvailable: {{ $.Values.podDisruptionBudgets.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "transformation-explorer.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $name }}
+---
+{{- end }}
+{{- end }}

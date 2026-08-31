@@ -1,0 +1,57 @@
+namespace:
+  create: true
+  name: transformation-explorer
+
+images:
+  web: { repository: transformation-explorer-web, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+  content: { repository: transformation-explorer-content, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+  assessment: { repository: transformation-explorer-assessment, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+  recommendation: { repository: transformation-explorer-recommendation, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+  postgres: { repository: postgres, tag: "17.6-alpine", pullPolicy: IfNotPresent }
+  redis: { repository: redis, tag: "8.2.1-alpine", pullPolicy: IfNotPresent }
+
+replicas:
+  web: 2
+  content: 2
+  assessment: 2
+  recommendation: 2
+
+resources:
+  web: { requests: { cpu: 25m, memory: 64Mi }, limits: { cpu: 200m, memory: 128Mi } }
+  content: { requests: { cpu: 50m, memory: 96Mi }, limits: { cpu: 300m, memory: 256Mi } }
+  assessment: { requests: { cpu: 75m, memory: 128Mi }, limits: { cpu: 500m, memory: 384Mi } }
+  recommendation: { requests: { cpu: 25m, memory: 64Mi }, limits: { cpu: 200m, memory: 192Mi } }
+  postgres: { requests: { cpu: 100m, memory: 256Mi }, limits: { cpu: 750m, memory: 768Mi } }
+  redis: { requests: { cpu: 25m, memory: 64Mi }, limits: { cpu: 200m, memory: 192Mi } }
+  bootstrap: { requests: { cpu: 25m, memory: 64Mi }, limits: { cpu: 250m, memory: 256Mi } }
+
+database:
+  name: transformation
+  existingSecret: transformation-explorer-database
+  storageClass: standard
+  storage: 1Gi
+
+ingress:
+  enabled: true
+  className: nginx
+  host: transformation.local
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    releaseLabel: kube-prometheus-stack
+  dashboard:
+    enabled: true
+    namespace: monitoring
+
+networkPolicy:
+  enabled: true
+  ingressNamespace: ingress-nginx
+  monitoringNamespace: monitoring
+
+podDisruptionBudgets:
+  enabled: true
+  minAvailable: 1
+
+revisionHistoryLimit: 3

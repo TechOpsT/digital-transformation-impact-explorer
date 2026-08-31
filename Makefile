@@ -1,8 +1,8 @@
-.PHONY: help lint contract-test test setup run build integration-test helm-lint
+.PHONY: help lint contract-test test setup run build integration-test helm-lint kubernetes-smoke
 
 help:
-	@echo "setup, lint, contract-test, test, run, build, integration-test"
-	@echo "helm-lint becomes available in Phase 2"
+	@echo "setup, lint, contract-test, test, run, build, integration-test, helm-lint, kubernetes-smoke"
+	@echo "kubernetes-smoke requires the Phase 2 release and ingress"
 
 setup:
 	npm ci
@@ -39,4 +39,9 @@ integration-test:
 	docker compose down
 
 helm-lint:
-	@echo "helm-lint becomes available in Phase 2" && exit 2
+	helm lint charts/transformation-explorer --strict
+	node tests/kubernetes/validate-chart.mjs
+
+kubernetes-smoke:
+	helm test transformation-explorer -n transformation-explorer
+	node tests/kubernetes/cluster-smoke.mjs

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: transformation-explorer
+description: Digital Transformation Impact Explorer application stack
+type: application
+version: 0.2.0
+appVersion: "0.2.0"
+kubeVersion: ">=1.30.0-0"

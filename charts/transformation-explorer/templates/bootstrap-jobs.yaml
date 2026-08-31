@@ -1,0 +1,49 @@
+{{- $jobs := dict
+  "content-migrate" (dict "image" .Values.images.content "passwordKey" "MIGRATION_DATABASE_PASSWORD" "command" (printf "export CONTENT_MIGRATION_DATABASE_URL=postgresql+psycopg://content_migrator:${DB_PASSWORD}@postgres:5432/%s; for attempt in $(seq 1 30); do alembic upgrade head && exit 0; sleep 2; done; exit 1" .Values.database.name) "weight" "0")
+  "assessment-migrate" (dict "image" .Values.images.assessment "passwordKey" "MIGRATION_DATABASE_PASSWORD" "command" (printf "export ASSESSMENT_MIGRATION_DATABASE_URL=postgresql+psycopg://assessment_migrator:${DB_PASSWORD}@postgres:5432/%s; for attempt in $(seq 1 30); do alembic upgrade head && exit 0; sleep 2; done; exit 1" .Values.database.name) "weight" "0")
+  "content-seed" (dict "image" .Values.images.content "passwordKey" "CONTENT_DATABASE_PASSWORD" "command" (printf "export CONTENT_DATABASE_URL=postgresql+psycopg://content:${DB_PASSWORD}@postgres:5432/%s; for attempt in $(seq 1 30); do python -m app.seed && exit 0; sleep 2; done; exit 1" .Values.database.name) "weight" "10")
+-}}
+{{- range $name, $cfg := $jobs }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}
+  namespace: {{ include "transformation-explorer.namespace" $ }}
+  labels:
+    {{- include "transformation-explorer.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: bootstrap
+  annotations:
+    helm.sh/hook: post-install,pre-upgrade
+    helm.sh/hook-weight: {{ $cfg.weight | quote }}
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 180
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        {{- include "transformation-explorer.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: bootstrap
+    spec:
+      restartPolicy: Never
+      serviceAccountName: transformation-explorer-bootstrap
+      automountServiceAccountToken: false
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: {{ $name }}
+          image: "{{ $cfg.image.repository }}:{{ $cfg.image.tag }}"
+          imagePullPolicy: {{ $cfg.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args: [{{ $cfg.command | quote }}]
+          env:
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: {{ $.Values.database.existingSecret }}, key: {{ $cfg.passwordKey }} } }
+          securityContext:
+            {{- include "transformation-explorer.securityContext" $ | nindent 12 }}
+          resources:
+            {{- toYaml $.Values.resources.bootstrap | nindent 12 }}
+          volumeMounts: [{ name: tmp, mountPath: /tmp }]
+      volumes: [{ name: tmp, emptyDir: {} }]
+---
+{{- end }}

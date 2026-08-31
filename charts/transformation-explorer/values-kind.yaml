@@ -1,0 +1,7 @@
+images:
+  web: { repository: transformation-explorer-web, tag: "phase2-5151de2-v2", pullPolicy: IfNotPresent }
+  content: { repository: transformation-explorer-content, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+  assessment: { repository: transformation-explorer-assessment, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+  recommendation: { repository: transformation-explorer-recommendation, tag: "phase2-5151de2", pullPolicy: IfNotPresent }
+ingress:
+  host: transformation.local
