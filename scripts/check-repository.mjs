@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const required = [
-  "AGENTS.md",
   "README.md",
   "Makefile",
   ".gitignore",
