@@ -2,7 +2,7 @@
 
 ## Scope
 
-Install, validate, upgrade, roll back, and remove the application on the local Enterprise Platform Lab Kind cluster. The commands assume the `kind-platform-lab` context and do not publish images or modify shared platform releases.
+This is the process I use to install, validate, upgrade, roll back, and remove the app on the local Enterprise Platform Lab Kind cluster. The commands assume the `kind-platform-lab` context. They do not publish images or change shared platform releases.
 
 ## Preconditions
 
@@ -70,4 +70,4 @@ Database migrations must remain backward compatible with the version being rolle
 helm uninstall transformation-explorer -n transformation-explorer
 ```
 
-The PostgreSQL PVC and namespace are intentionally retained. Deleting either destroys or makes persistent assessment data unavailable and requires explicit authorization after verifying the exact target.
+I leave the PostgreSQL PVC and namespace in place during a normal uninstall so assessment data is not accidentally lost. Deleting either one can make that data unavailable, so verify the exact target and make sure the deletion is really intended first.

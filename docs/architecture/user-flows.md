@@ -1,4 +1,6 @@
-# Low-fidelity user flows
+# User flows
+
+These flows keep the experience simple: learn the ideas, complete an assessment, and leave with a result that explains itself.
 
 ## Learn
 
@@ -40,4 +42,3 @@ Stable result link → Loading → Result
 ```
 
 The public identifier is opaque. Result pages contain no personal data and should not be treated as secret sharing links.
-

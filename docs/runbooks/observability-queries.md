@@ -2,7 +2,7 @@
 
 ## Metrics
 
-The chart creates a `ServiceMonitor` in `monitoring` and a Grafana dashboard ConfigMap. Useful PromQL queries include:
+The chart creates a `ServiceMonitor` in `monitoring` and a Grafana dashboard ConfigMap. These are the PromQL queries I reach for most often:
 
 ```text
 sum(rate(http_requests_total{namespace="transformation-explorer"}[5m])) by (service)
@@ -22,4 +22,4 @@ Once the platform-owned Alloy discovery list includes `transformation-explorer`,
 sum by (service, severity) (count_over_time({namespace="transformation-explorer"} | json [5m]))
 ```
 
-Alloy currently limits discovery to the original `platform-lab` namespace. This application repository does not alter that shared platform configuration; the platform repository must approve and record the namespace addition before centralized-log evidence can pass.
+One current limitation: Alloy only discovers the original `platform-lab` namespace. I am keeping that shared configuration in the Enterprise Platform Lab repository, so centralized logging for this app will stay incomplete until I add the namespace there and document the change.

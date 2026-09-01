@@ -2,7 +2,7 @@
 
 ## Goals
 
-The algorithm is deterministic, transparent, dimension-balanced, and reproducible from a stored result. Version identifier: `scoring-1.0.0`.
+I designed the scoring to be predictable, easy to explain, balanced across dimensions, and reproducible from a stored result. The first version is `scoring-1.0.0`.
 
 ## Inputs
 
@@ -67,4 +67,3 @@ Version 1 selects one matching action for each of the three lowest dimensions. A
 ## Invalid inputs
 
 Reject missing required answers, duplicate question responses, unknown IDs, option/question mismatches, values outside 0–4, questionnaire-version mismatches, and attempts to complete an already-invalidated assessment.
-

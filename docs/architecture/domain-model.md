@@ -1,8 +1,8 @@
-# Initial domain model
+# Domain model
 
 ## Versioning policy
 
-Questionnaires, scoring policies, maturity ranges, and recommendation rule sets use immutable semantic identifiers such as `questionnaire-1.0.0`. A completed assessment records all applicable versions so its result remains explainable after rules change.
+I give questionnaires, scoring policies, maturity ranges, and recommendation rule sets immutable identifiers such as `questionnaire-1.0.0`. Each completed assessment records the versions it used, which means I can still explain an older result after the rules change.
 
 ## Entities and ownership
 

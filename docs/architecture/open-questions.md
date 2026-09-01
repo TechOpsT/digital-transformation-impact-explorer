@@ -1,6 +1,6 @@
-# Phase 0 review: ambiguities and open questions
+# Open questions
 
-No direct conflicts were found between the project brief and repository instructions. The following choices are intentionally unresolved or proposed:
+I use this page to keep track of decisions that are still open, along with the point in the roadmap when I expect to have enough context to make them.
 
 | Topic | Current Phase 0 position | Decision needed before |
 | --- | --- | --- |
@@ -13,5 +13,7 @@ No direct conflicts were found between the project brief and repository instruct
 | Stable result-link privacy | Results are anonymous and non-secret; retention and deletion policy remain open | Shared deployment |
 | Open-source license | Deferred until publication intent is confirmed | First public release |
 | CI action pinning | Major tags are acceptable for Phase 0; full SHA pinning is required in the supply-chain phase | Phase 3 |
+| Kyverno policy baseline | Platform-owned Kyverno will provide admission policy and reporting; select the application policy set, exceptions, audit-to-enforce criteria, and CI validation approach | Phase 3 |
+| Backup and recovery objectives | Platform-owned Velero will protect Kubernetes resources and eligible volumes, supplemented by database-native PostgreSQL backups; define RPO, RTO, retention, encryption, restore ownership, and drill cadence | Phase 4 |
 
-The initial recommendation lookup ambiguity is resolved by ADR 0005. The endpoint and generated recommendation identifiers were removed before implementation.
+ADR 0005 settled the earlier question about recommendation lookup. I removed the extra endpoint and generated recommendation IDs before implementation because they did not have a useful lifecycle of their own.

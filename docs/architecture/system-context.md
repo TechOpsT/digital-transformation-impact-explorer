@@ -1,5 +1,7 @@
 # System context
 
+I keep the service boundaries narrow on purpose: content explains the subject, assessment owns a user's progress and results, and recommendation evaluates versioned rules. This diagram shows how those pieces fit together.
+
 ```text
 Browser
   ├─ GET content/questionnaire ───────────────→ Content service
@@ -14,4 +16,4 @@ Recommendation service ─ version-controlled rules; no runtime database
 Services ──────────── reconstructable caches ───── Redis
 ```
 
-Ingress routing, observability backends, secrets integration, and GitOps controllers are owned by the Enterprise Platform Lab. Phase 0 defines contracts only; runtime topology begins in Phase 1 and Kubernetes resources in Phase 2.
+The Enterprise Platform Lab owns the shared pieces around the app: ingress, observability backends, secrets integration, and GitOps controllers. I introduced the runtime services in Phase 1 and the Kubernetes resources in Phase 2.
